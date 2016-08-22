@@ -1,0 +1,23 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Tasks>
+      <Task ID="OMS.Network.Performance.Monitor.Agent.Task.Disable.NPM.Task" Enabled="true" Accessibility="Internal" Remotable="false" Target="SC!Microsoft.SystemCenter.HealthService" Timeout="120">
+        <Category>Operations</Category>
+        <WriteAction ID="WA" TypeID="OMS.Network.Performance.Monitor.Agent.Task.NPM.Config.WA">
+          <PortNumber>8084</PortNumber>
+          <DisableRule>true</DisableRule>
+          <TimeoutSeconds>120</TimeoutSeconds>
+        </WriteAction>
+      </Task>
+    </Tasks>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="OMS.Network.Performance.Monitor.Agent.Task.Disable.NPM.Task">
+          <Name>Disable OMS Network Performance Monitor</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

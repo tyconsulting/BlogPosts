@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 14
+VisualStudioVersion = 14.0.25420.1
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{D4B43EB3-688B-4EEE-86BD-088F0B28ABB3}") = "OMS.Network.Performance.Monitor.Agent.Task", "OMS.Network.Performance.Monitor.Agent.Task\OMS.Network.Performance.Monitor.Agent.Task.mpproj", "{D848A294-A878-4437-BA47-CEB0FA28AC40}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D848A294-A878-4437-BA47-CEB0FA28AC40}.Debug|x86.ActiveCfg = Debug|x86
+		{D848A294-A878-4437-BA47-CEB0FA28AC40}.Debug|x86.Build.0 = Debug|x86
+		{D848A294-A878-4437-BA47-CEB0FA28AC40}.Release|x86.ActiveCfg = Release|x86
+		{D848A294-A878-4437-BA47-CEB0FA28AC40}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal

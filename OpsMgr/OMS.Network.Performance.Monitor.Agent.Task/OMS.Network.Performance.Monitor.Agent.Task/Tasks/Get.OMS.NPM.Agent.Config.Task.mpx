@@ -1,0 +1,21 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Tasks>
+      <Task ID="OMS.Network.Performance.Monitor.Agent.Task.Get.OMS.NPM.Agent.Configuration.Task" Accessibility="Internal" Remotable ="false" Enabled="true" Target="SC!Microsoft.SystemCenter.HealthService" Timeout="120">
+        <Category>Operations</Category>
+        <WriteAction ID="WA" TypeID="OMS.Network.Performance.Monitor.Agent.Task.Get.NPM.Agent.Config.WA">
+          <TimeoutSeconds>120</TimeoutSeconds>
+        </WriteAction>
+      </Task>
+    </Tasks>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="OMS.Network.Performance.Monitor.Agent.Task.Get.OMS.NPM.Agent.Configuration.Task">
+          <Name>Get OMS Network Performance Monitor Agent Configuration</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

@@ -1,0 +1,31 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <Monitoring>
+    <Rules>
+      <Rule ID="OMS.NRT.Perf.Collection.Demo.SQL.Log.Cache.Hit.Ratio.Perf.Rule" Target="SQL!Microsoft.SQLServer.Database" Enabled="true" Remotable="false" ConfirmDelivery="false" Priority="Normal" DiscardLevel="100">
+        <Category>PerformanceCollection</Category>
+        <DataSources>
+          <DataSource ID="DS" TypeID="IPTypes!Microsoft.IntelligencePacks.Performance.DataProvider">
+            <ComputerName>$Target/Host/Host/Property[Type="Windows!Microsoft.Windows.Computer"]/NetworkName$</ComputerName>
+            <CounterName>Log Cache Hit Ratio</CounterName>
+            <ObjectName>SQLServer:Databases</ObjectName>
+            <InstanceName>$Target/Property[Type="SQL!Microsoft.SQLServer.Database"]/DatabaseName$</InstanceName>
+            <AllInstances>false</AllInstances>
+            <IntervalSeconds>10</IntervalSeconds>
+          </DataSource>
+        </DataSources>
+        <WriteActions>
+          <WriteAction ID ="WA" TypeID="IPTypes!Microsoft.SystemCenter.CollectCloudPerformanceData_PerfIP" />
+        </WriteActions>
+      </Rule>
+    </Rules>
+  </Monitoring>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="OMS.NRT.Perf.Collection.Demo.SQL.Log.Cache.Hit.Ratio.Perf.Rule">
+          <Name>OMS NRT Performance Collection Demo SQL Log Cache Hit Ratio Perf Rule</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>

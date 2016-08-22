@@ -1,0 +1,58 @@
+﻿<ManagementPackFragment SchemaVersion="2.0" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <TypeDefinitions>
+    <ModuleTypes>
+      <WriteActionModuleType ID="OMS.Network.Performance.Monitor.Agent.Task.NPM.Config.WA" Accessibility="Internal" Batching="false">
+        <Configuration>
+          <xsd:element minOccurs="1" name="PortNumber" type="xsd:integer" />
+          <xsd:element minOccurs="1" name="DisableRule" type="xsd:boolean" />
+          <xsd:element minOccurs="1" name="TimeoutSeconds" type="xsd:integer" />
+        </Configuration>
+        <OverrideableParameters>
+          <OverrideableParameter ID="PortNumber" Selector="$Config/PortNumber$" ParameterType="int" />
+          <OverrideableParameter ID="TimeoutSeconds" Selector="$Config/TimeoutSeconds$" ParameterType="int" />
+        </OverrideableParameters>
+        <ModuleImplementation Isolation="Any">
+          <Composite>
+            <MemberModules>
+              <WriteAction ID="Script" TypeID="Windows!Microsoft.Windows.PowerShellWriteAction">
+                <ScriptName>EnableRules.ps1</ScriptName>
+                <ScriptBody>$IncludeFileContent/Scripts/EnableRules.ps1$</ScriptBody>
+                <Parameters>
+                  <Parameter>
+                    <Name>portNumber</Name>
+                    <Value>$Config/PortNumber$</Value>
+                  </Parameter>
+                  <Parameter>
+                    <Name>DisableRule</Name>
+                    <Value>$Config/DisableRule$</Value>
+                  </Parameter>
+                </Parameters>
+                <TimeoutSeconds>$Config/TimeoutSeconds$</TimeoutSeconds>
+              </WriteAction>
+            </MemberModules>
+            <Composition>
+              <Node ID="Script" />
+            </Composition>
+          </Composite>
+        </ModuleImplementation>
+        <InputType>System!System.BaseData</InputType>
+      </WriteActionModuleType>
+    </ModuleTypes>
+  </TypeDefinitions>
+  <LanguagePacks>
+    <LanguagePack ID="ENU" IsDefault="true">
+      <DisplayStrings>
+        <DisplayString ElementID="OMS.Network.Performance.Monitor.Agent.Task.NPM.Config.WA">
+          <Name>Configure OMS Network Performance Monitor Write Action</Name>
+        </DisplayString>
+        <DisplayString ElementID="OMS.Network.Performance.Monitor.Agent.Task.NPM.Config.WA" SubElementID="PortNumber">
+          <Name>Port Number</Name>
+          <Description>The default port for OMS Network Performance Monitor is 8084. Please make sure ALL agents are using the same port.</Description>
+        </DisplayString>
+        <DisplayString ElementID="OMS.Network.Performance.Monitor.Agent.Task.NPM.Config.WA" SubElementID="TimeoutSeconds">
+          <Name>Timeout Seconds</Name>
+        </DisplayString>
+      </DisplayStrings>
+    </LanguagePack>
+  </LanguagePacks>
+</ManagementPackFragment>
