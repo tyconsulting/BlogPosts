@@ -127,7 +127,7 @@ else {
 $NetworkID = $addressPrefix.split("/")[0]
 [int]$CIDR = $addressPrefix.split("/")[1]
 $iAddressWidth = [System.Math]::Pow(2, $(32 - $CIDR))
-$AzSubnetSize = $iAddressWidth - 5 # 5 IPs are reserved by Azure
+[int]$AzSubnetSize = $iAddressWidth - 5 # 5 IPs are reserved by Azure
 
 #Validating IP index (the index number must no exceed the total available IPs in the subnet)
 if ($PSBoundParameters.ContainsKey('index')) {
