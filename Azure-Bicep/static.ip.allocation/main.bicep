@@ -5,9 +5,14 @@ param location string = 'australia east'
 param vnetRG string
 param vnetName string
 param subnetName string
-param ipIndex int = 3
+param vmIpIndex int = 3
+param vmName string
+param vmAdminUserName string
 
-var rgName = 'rg-deployment-script'
+@secure()
+param vmAdminPassword string
+
+var rgName = 'rg-vm-demo'
 var subId = subscription().subscriptionId
 var subnetId = 'subscriptions/${subId}/resourceGroups/${vnetRG}/providers/Microsoft.Network/virtualNetworks/${vnetName}/subnets/${subnetName}'
 var subnetAddressPrefix = reference(subnetId, '2020-07-01', 'Full').properties.addressPrefix
@@ -26,27 +31,41 @@ module storage_account './storage-account.bicep' = {
   }
 }
 
-module azcidrhost_deployment_script './azcidrhost-function.bicep' = {
-  name: 'azcidrhost'
+module ubuntu01_private_ip_deployment_script './azcidrhost-function.bicep' = {
+  name: 'ubuntu01_private_ip'
   scope: resourceGroup(rg.name)
   params: {
-    //uamiId: uamiId
     location: location
     addressPrefix: subnetAddressPrefix
-    ipIndex: ipIndex
+    ipIndex: vmIpIndex
     storageAccountName: storage_account.outputs.name
     storageAccountId: storage_account.outputs.id
     storageAccountApiVersion: storage_account.outputs.apiVersion
   }
 }
 
-output SelectedIP string = azcidrhost_deployment_script.outputs.SelectedIP
-output SubnetSize int = azcidrhost_deployment_script.outputs.SubnetSize
-output GatewayIP string = azcidrhost_deployment_script.outputs.GatewayIP
-output DNSIP1 string = azcidrhost_deployment_script.outputs.DNSIP1
-output DNSIP2 string = azcidrhost_deployment_script.outputs.DNSIP2
-output FirstUsableIP string = azcidrhost_deployment_script.outputs.FirstUsableIP
-output LastUsableIP string = azcidrhost_deployment_script.outputs.LastUsableIP
+module ubuntu_vm './vm-ubuntu.bicep' = {
+  name: 'ubuntu01'
+  scope: resourceGroup(rg.name)
+  params: {
+    adminUsername: vmAdminUserName
+    adminPasswordOrKey: vmAdminPassword
+    location: location
+    vmName: vmName
+    privateIP: ubuntu01_private_ip_deployment_script.outputs.SelectedIP
+    subnetId: subnetId
+    authenticationType: 'password'
+  }
+}
+
+output SelectedIP string = ubuntu01_private_ip_deployment_script.outputs.SelectedIP
+output SubnetSize int = ubuntu01_private_ip_deployment_script.outputs.SubnetSize
+output GatewayIP string = ubuntu01_private_ip_deployment_script.outputs.GatewayIP
+output DNSIP1 string = ubuntu01_private_ip_deployment_script.outputs.DNSIP1
+output DNSIP2 string = ubuntu01_private_ip_deployment_script.outputs.DNSIP2
+output FirstUsableIP string = ubuntu01_private_ip_deployment_script.outputs.FirstUsableIP
+output LastUsableIP string = ubuntu01_private_ip_deployment_script.outputs.LastUsableIP
 
 output subnetId string = subnetId
 output subnetAddressPrefix string = subnetAddressPrefix
+output vmPrivateIp string = ubuntu_vm.outputs.privateIPAddress
