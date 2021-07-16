@@ -1,0 +1,450 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "2351850326752015702"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "australia east"
+    },
+    "uamiId": {
+      "type": "string"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "roleName": "Jedi Master",
+    "roleDescription": "May the force be with you",
+    "roleId": "[guid('customRole-jedi-master')]",
+    "rgName": "rg-deployment-script"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('rgName')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "deploymentScriptStorage",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "14481356560370698051"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2019-06-01",
+              "name": "[format('sadscript{0}', uniqueString(resourceGroup().id))]",
+              "location": "[parameters('location')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              }
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "value": "[format('sadscript{0}', uniqueString(resourceGroup().id))]"
+            },
+            "id": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', format('sadscript{0}', uniqueString(resourceGroup().id)))]"
+            },
+            "apiVersion": {
+              "type": "string",
+              "value": "2019-06-01"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "roleDefinitionDiscovery",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "uamiId": {
+            "value": "[parameters('uamiId')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "roleName": {
+            "value": "[variables('roleName')]"
+          },
+          "storageAccountName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.name.value]"
+          },
+          "storageAccountId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.id.value]"
+          },
+          "storageAccountApiVersion": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.apiVersion.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "7162706988713150382"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "utcValue": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
+            },
+            "roleName": {
+              "type": "string"
+            },
+            "uamiId": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountId": {
+              "type": "string"
+            },
+            "storageAccountApiVersion": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "roleDefinitionDiscovery",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[parameters('uamiId')]": {}
+                }
+              },
+              "kind": "AzurePowerShell",
+              "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azPowerShellVersion": "3.0",
+                "timeout": "PT10M",
+                "storageAccountSettings": {
+                  "storageAccountName": "[parameters('storageAccountName')]",
+                  "storageAccountKey": "[listKeys(parameters('storageAccountId'), parameters('storageAccountApiVersion')).keys[0].value]"
+                },
+                "arguments": "[format('-roleName ''{0}''', parameters('roleName'))]",
+                "scriptContent": "    param($roleName)\n    $role = Get-AzRoleDefinition -Name $roleName\n    if ($role) {\n      $roleExists = $true\n      $existingRoleId = $role.id\n      $existingScopes = $role.AssignableScopes -join ','\n    } else {\n      $roleExists = $false\n      $existingRoleId = 'null'\n      $existingScope = 'null'\n    }\n    $DeploymentScriptsOutputs = @{}\n    $DeploymentScriptOutputs['roleExists'] = $roleExists\n    $DeploymentScriptOutputs['existingRoleId'] = $existingRoleId\n    $DeploymentScriptOutputs['existingScopes'] = $existingScopes\n    ",
+                "cleanupPreference": "OnSuccess",
+                "retentionInterval": "P1D"
+              }
+            }
+          ],
+          "outputs": {
+            "roleExists": {
+              "type": "bool",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'roleDefinitionDiscovery')).outputs.roleExists]"
+            },
+            "existingRoleId": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'roleDefinitionDiscovery')).outputs.existingRoleId]"
+            },
+            "existingScopes": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'roleDefinitionDiscovery')).outputs.existingScopes]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "roleDefinitionDeployment",
+      "location": "[deployment().location]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "roleName": {
+            "value": "[variables('roleName')]"
+          },
+          "roleDescription": {
+            "value": "[variables('roleDescription')]"
+          },
+          "roleId": {
+            "value": "[variables('roleId')]"
+          },
+          "roleExists": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery'), '2019-10-01').outputs.roleExists.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "14231525123272553748"
+            }
+          },
+          "parameters": {
+            "roleName": {
+              "type": "string"
+            },
+            "roleDescription": {
+              "type": "string"
+            },
+            "roleId": {
+              "type": "string"
+            },
+            "roleExists": {
+              "type": "bool"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "condition": "[equals(parameters('roleExists'), false())]",
+              "type": "Microsoft.Authorization/roleDefinitions",
+              "apiVersion": "2018-01-01-preview",
+              "name": "[parameters('roleId')]",
+              "properties": {
+                "roleName": "[parameters('roleName')]",
+                "description": "[parameters('roleDescription')]",
+                "assignableScopes": [
+                  "[subscription().id]"
+                ],
+                "permissions": [
+                  {
+                    "actions": [
+                      "Microsoft.Authorization/*/read",
+                      "Microsoft.Authorization/policyAssignments/*",
+                      "Microsoft.Authorization/policyDefinitions/*",
+                      "Microsoft.Authorization/policySetDefinitions/*"
+                    ],
+                    "notActions": []
+                  }
+                ]
+              }
+            }
+          ],
+          "outputs": {
+            "newRoleId": {
+              "type": "string",
+              "value": "[if(parameters('roleExists'), 'null', parameters('roleId'))]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "roleScopeUpdate",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "uamiId": {
+            "value": "[parameters('uamiId')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "roleName": {
+            "value": "[variables('roleName')]"
+          },
+          "subscriptionId": {
+            "value": "[subscription().subscriptionId]"
+          },
+          "roleExists": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery'), '2019-10-01').outputs.roleExists.value]"
+          },
+          "storageAccountName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.name.value]"
+          },
+          "storageAccountId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.id.value]"
+          },
+          "storageAccountApiVersion": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.apiVersion.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "883469610124594291"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "utcValue": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
+            },
+            "roleName": {
+              "type": "string"
+            },
+            "subscriptionId": {
+              "type": "string"
+            },
+            "roleExists": {
+              "type": "bool"
+            },
+            "uamiId": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountId": {
+              "type": "string"
+            },
+            "storageAccountApiVersion": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "condition": "[equals(parameters('roleExists'), true())]",
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "roleDefinitionUpdate",
+              "location": "[parameters('location')]",
+              "identity": {
+                "type": "UserAssigned",
+                "userAssignedIdentities": {
+                  "[parameters('uamiId')]": {}
+                }
+              },
+              "kind": "AzurePowerShell",
+              "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azPowerShellVersion": "3.0",
+                "timeout": "PT10M",
+                "storageAccountSettings": {
+                  "storageAccountName": "[parameters('storageAccountName')]",
+                  "storageAccountKey": "[listKeys(parameters('storageAccountId'), parameters('storageAccountApiVersion')).keys[0].value]"
+                },
+                "arguments": "[format('-roleName ''{0}'' -subId ''{1}''', parameters('roleName'), parameters('subscriptionId'))]",
+                "scriptContent": "    param($roleName, $subId)\n    $roleScopeUpdated = $false\n    $role = Get-AzRoleDefinition -Name $roleName\n    if ($role) {\n      if ($role.IsCustom)\n      {\n        if ($role.AssignableScopes -inotcontains \"/subscriptions/$subid\") {\n          $newScope = $role.AssignableScopes\n          $newScope += \"/subscriptions/$subId\"\n          $strNewScope = $newScope -join \",\"\n          $role.AssignableScopes.Add(\"/subscriptions/$subId\")\n          set-AzRoleDefinition -Role $role\n          $roleScopeUpdated = $true\n          $output = \"Role assignable scope updated. New scope: $strNewscope\"\n        } else {\n          $output = \"subscription $subId is already included in the role assignable scope\"\n        }\n      } else {\n        $output = \"The role '$roleName' is not a custom role.\"\n      }\n    } else {\n      $output = \"Cannot find the role definition for '$roleName'.\"\n    }\n    Write-Output $output\n    $DeploymentScriptsOutputs = @{}\n    $DeploymentScriptOutputs['roleScopeUpdated'] = $roleScopeUpdated\n    $DeploymentScriptOutputs['outputText'] = $output\n    ",
+                "cleanupPreference": "OnSuccess",
+                "retentionInterval": "P1D"
+              }
+            }
+          ],
+          "outputs": {
+            "roleScopeUpdated": {
+              "type": "bool",
+              "value": "[if(parameters('roleExists'), reference(resourceId('Microsoft.Resources/deploymentScripts', 'roleDefinitionUpdate')).outputs.roleScopeUpdated, false())]"
+            },
+            "outputText": {
+              "type": "string",
+              "value": "[if(parameters('roleExists'), reference(resourceId('Microsoft.Resources/deploymentScripts', 'roleDefinitionUpdate')).outputs.outputText, 'Role definition update not required.')]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery')]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage')]"
+      ]
+    }
+  ],
+  "outputs": {
+    "roleExists": {
+      "type": "bool",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery'), '2019-10-01').outputs.roleExists.value]"
+    },
+    "existingRoleId": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery'), '2019-10-01').outputs.existingRoleId.value]"
+    },
+    "existingScopes": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleDefinitionDiscovery'), '2019-10-01').outputs.existingScopes.value]"
+    },
+    "existingRoleScopeUpdated": {
+      "type": "bool",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleScopeUpdate'), '2019-10-01').outputs.roleScopeUpdated.value]"
+    },
+    "existingRoleScopeUpdateMessage": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'roleScopeUpdate'), '2019-10-01').outputs.outputText.value]"
+    },
+    "newRoleId": {
+      "type": "string",
+      "value": "[reference(subscriptionResourceId('Microsoft.Resources/deployments', 'roleDefinitionDeployment'), '2019-10-01').outputs.newRoleId.value]"
+    }
+  }
+}
