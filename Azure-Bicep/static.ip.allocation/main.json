@@ -1,0 +1,710 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2018-05-01/subscriptionDeploymentTemplate.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "_generator": {
+      "name": "bicep",
+      "version": "0.4.63.48766",
+      "templateHash": "3243790102444052428"
+    }
+  },
+  "parameters": {
+    "location": {
+      "type": "string",
+      "defaultValue": "australia east"
+    },
+    "vnetRG": {
+      "type": "string"
+    },
+    "vnetName": {
+      "type": "string"
+    },
+    "subnetName": {
+      "type": "string"
+    },
+    "vmIpIndexes": {
+      "type": "string",
+      "defaultValue": "3,4"
+    },
+    "vmName1": {
+      "type": "string"
+    },
+    "vmName2": {
+      "type": "string"
+    },
+    "vmAdminUserName": {
+      "type": "string"
+    },
+    "vmAdminPassword": {
+      "type": "secureString"
+    }
+  },
+  "functions": [],
+  "variables": {
+    "rgName": "rg-vm-demo",
+    "subId": "[subscription().subscriptionId]",
+    "subnetId": "[format('subscriptions/{0}/resourceGroups/{1}/providers/Microsoft.Network/virtualNetworks/{2}/subnets/{3}', variables('subId'), parameters('vnetRG'), parameters('vnetName'), parameters('subnetName'))]"
+  },
+  "resources": [
+    {
+      "type": "Microsoft.Resources/resourceGroups",
+      "apiVersion": "2020-06-01",
+      "name": "[variables('rgName')]",
+      "location": "[parameters('location')]"
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "deploymentScriptStorage",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "14481356560370698051"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Storage/storageAccounts",
+              "apiVersion": "2019-06-01",
+              "name": "[format('sadscript{0}', uniqueString(resourceGroup().id))]",
+              "location": "[parameters('location')]",
+              "kind": "StorageV2",
+              "sku": {
+                "name": "Standard_LRS"
+              }
+            }
+          ],
+          "outputs": {
+            "name": {
+              "type": "string",
+              "value": "[format('sadscript{0}', uniqueString(resourceGroup().id))]"
+            },
+            "id": {
+              "type": "string",
+              "value": "[resourceId('Microsoft.Storage/storageAccounts', format('sadscript{0}', uniqueString(resourceGroup().id)))]"
+            },
+            "apiVersion": {
+              "type": "string",
+              "value": "2019-06-01"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "private_ip",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "addressPrefix": {
+            "value": "[reference(variables('subnetId'), '2020-07-01', 'Full').properties.addressPrefix]"
+          },
+          "ipIndexes": {
+            "value": "[parameters('vmIpIndexes')]"
+          },
+          "storageAccountName": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.name.value]"
+          },
+          "storageAccountId": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.id.value]"
+          },
+          "storageAccountApiVersion": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage'), '2019-10-01').outputs.apiVersion.value]"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "13410085876004451957"
+            }
+          },
+          "parameters": {
+            "location": {
+              "type": "string"
+            },
+            "utcValue": {
+              "type": "string",
+              "defaultValue": "[utcNow()]"
+            },
+            "addressPrefix": {
+              "type": "string"
+            },
+            "ipIndexes": {
+              "type": "string"
+            },
+            "storageAccountName": {
+              "type": "string"
+            },
+            "storageAccountId": {
+              "type": "string"
+            },
+            "storageAccountApiVersion": {
+              "type": "string"
+            }
+          },
+          "functions": [],
+          "resources": [
+            {
+              "type": "Microsoft.Resources/deploymentScripts",
+              "apiVersion": "2020-10-01",
+              "name": "azcidrhost",
+              "location": "[parameters('location')]",
+              "kind": "AzurePowerShell",
+              "properties": {
+                "forceUpdateTag": "[parameters('utcValue')]",
+                "azPowerShellVersion": "3.0",
+                "timeout": "PT10M",
+                "storageAccountSettings": {
+                  "storageAccountName": "[parameters('storageAccountName')]",
+                  "storageAccountKey": "[listKeys(parameters('storageAccountId'), parameters('storageAccountApiVersion')).keys[0].value]"
+                },
+                "arguments": "[format('-addressPrefix ''{0}'' -indexes {1}', parameters('addressPrefix'), parameters('ipIndexes'))]",
+                "scriptContent": "    [CmdletBinding()]\n    Param (\n      [Parameter(Mandatory = $true, Position = 0)][string]$addressPrefix,\n      [Parameter(Mandatory = $false, Position = 1)]$indexes\n    )\n\n    <#\n    Note: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets\n    - 5 IPs reserved by Azure\n      - x.x.x.0: Network address\n      - x.x.x.1: Reserved by Azure for the default gateway\n      - x.x.x.2, x.x.x.3: Reserved by Azure to map the Azure DNS IPs to the VNet space\n      - x.x.x.255: Network broadcast address\n    #>\n    #region Functions\n\n    function ValidateAzAddressPrefix ($addressPrefix) {\n      $NetworkID = $addressPrefix.split(\"/\")[0]\n      [int]$CIDR = $addressPrefix.split(\"/\")[1]\n      $script:binIP = (ConvertIPToBinary $NetworkID).Replace(\".\", \"\")\n      $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))\n      \n      $bValidAddressPrefix = $true\n\n      # 1. make sure CIDR notation value is between 1 and 29\n      if ($CIDR -lt 1 -or $CIDR -gt 29) {\n        $bValidAddressPrefix = $false\n      }\n\n      # 2. make sure the address space must contain all \"0\"\n      # network prefix length must equals, address space section must contain all \"0\"\n      if ($script:binIPAddressSection -notmatch \"^0{$(32-$CIDR)}$\") {\n        $bValidAddressPrefix = $false\n      }\n      $bValidAddressPrefix\n    }\n    function ValidateIP ($strIP) {\n      $bValidIP = $true\n      $arrSections = @()\n      $arrSections += $strIP.split(\".\")\n      #firstly, make sure there are 4 sections in the IP address\n      if ($arrSections.count -ne 4) { $bValidIP = $false }\n      \n      #secondly, make sure it only contains numbers and it's between 0-254\n      if ($bValidIP) {\n        foreach ($item in $arrSections) {\n          if ($item -notmatch \"^\\d{1,3}$\") { \n            $bValidIP = $false \n          }\n        }\n      }\n      \n      if ($bValidIP) {\n        foreach ($item in $arrSections) {\n          $item = [int]$item\n          if ($item -lt 0 -or $item -gt 254) { $bValidIP = $false }\n        }\n      }\n      \n      $bValidIP\n    }\n\n    function ConvertToBinary ($strDecimal) {\n      $strBinary = [Convert]::ToString($strDecimal, 2)\n      if ($strBinary.length -lt 8) {\n        while ($strBinary.length -lt 8) {\n          $strBinary = \"0\" + $strBinary\n        }\n      }\n      $strBinary\n    }\n    function ConvertIPToBinary ($strIP) {\n      $strBinaryIP = $null\n      if (ValidateIP $strIP) {\n        $arrSections = @()\n        $arrSections += $strIP.split(\".\")\n        foreach ($section in $arrSections) {\n          if ($strBinaryIP -ne $null) {\n            $strBinaryIP = $strBinaryIP + \".\"\n          }\n          $strBinaryIP = $strBinaryIP + (ConvertToBinary $section)\n          \n        }\n      }\n      $strBinaryIP\n    }\n\n    Function ConvertBinaryToIP ($script:binIP) {\n      $FirstSection = [Convert]::ToInt64(($script:binIP.substring(0, 8)), 2)\n      $SecondSection = [Convert]::ToInt64(($script:binIP.substring(8, 8)), 2)\n      $ThirdSection = [Convert]::ToInt64(($script:binIP.substring(16, 8)), 2)\n      $FourthSection = [Convert]::ToInt64(($script:binIP.substring(24, 8)), 2)\n      $strIP = \"$FirstSection`.$SecondSection`.$ThirdSection`.$FourthSection\"\n      $strIP\n    }\n\n    Function GetUsableIPByIndex ($index) {\n      $binIndex = [convert]::ToString($index, 2) \n      $indexIPReplaceStr = \"\"\n      $i = 0\n      do {\n        [string]$indexIPReplaceStr = \"$indexIPReplaceStr\" + '0'\n        $i = $i + 1\n      } until ($i -eq $BinIndex.Length)\n      $indexIPReplaceStr = $indexIPReplaceStr + '$'\n      $indexIPSection = $script:binIPAddressSection -replace $indexIPReplaceStr, $BinIndex\n      $BinIndexAddress = $script:binIPNetworkSection + $indexIPSection\n      $indexIP = ConvertBinaryToIP $BinIndexAddress\n      $indexIP\n    }\n    #endregion\n\n    #region Main\n    $arrIndexes = @()\n    if ($PSBoundParameters.ContainsKey(\"indexes\")) {\n      foreach ($item in $indexes) {\n        $arrIndexes += [int]::Parse($item)\n      }\n    }\n    $arrIndexes = $indexes -split (',')\n    Write-Verbose $addressPrefix\n\n    #validation\n    #validating AddressPrefix\n    Write-Verbose \"Validating $addressPrefix\"\n    if (!(ValidateAzAddressPrefix $addressPrefix)) {\n      Throw \"Invalid Network CIDR specified.\"\n      Exit -1\n    }\n    else {\n      Write-verbose \"Network ID $addressPrefix is valid\"\n    }\n\n    $NetworkID = $addressPrefix.split(\"/\")[0]\n    [int]$CIDR = $addressPrefix.split(\"/\")[1]\n    $iAddressWidth = [System.Math]::Pow(2, $(32 - $CIDR))\n    [int]$AzSubnetSize = $iAddressWidth - 5 # 5 IPs are reserved by Azure\n\n    #Validating IP index (the index number must no exceed the total available IPs in the subnet)\n    if ($PSBoundParameters.ContainsKey('indexes')) {\n      foreach ($index in $arrIndexes) {\n        If ([int]$index -gt $AzSubnetSize) {\n          Throw \"There are $AzSubnetSize usable IPs in the subnet $addressPrefix. The index number $index must no exceed the total available usable IPs in the subnet.\"\n          #exit -1\n        }\n      }\n    }\n\n    Write-Verbose \"There are $AzSubnetSize usable IPs in Azure subnet $addressPrefix\"\n\n    $script:binIP = (ConvertIPToBinary $NetworkID).Replace(\".\", \"\")\n    $script:binIPNetworkSection = $script:binIP.substring(0, $CIDR)\n    $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))\n      \n    #Azure Gateway IP\n    $strAzGWIP = GetUsableIPByIndex 1\n    Write-Verbose \"The gateway IP for the Azure subnet is $strAzGWIP\"\n\n    #Azure DNS Server IP #1\n    $strAzDNSIP1 = GetUsableIPByIndex 2\n    Write-Verbose \"The 1st DNS server IP for the Azure subnet is $strAzDNSIP1\"\n\n    #Azure DNS Server IP #2\n    $strAzDNSIP2 = GetUsableIPByIndex 3\n    Write-Verbose \"The 2nd DNS server IP for the Azure subnet is $strAzDNSIP2\"\n\n    #First Usable IP\n    $strAzFirstUsableIP = GetUsableIPByIndex 4 # excluding the first 3 reserved IPs\n    Write-Verbose \"The First usable IP for the Azure subnet is $strAzFirstUsableIP\"\n\n    if ($PSBoundParameters.ContainsKey('indexes')) {\n      $htSelectedIPs = @{}\n      foreach ($index in $arrIndexes) {\n        #Index IP (The No. of USABLE IP)\n        $usableIndex = [int]$index + 3 # considering the first 3 IPs in a subnet is reserved\n        $strSelectedIP = GetUsableIPByIndex $usableIndex\n        Write-Verbose \"The select IP address for index $index is $strSelectedIP\"\n        $htSelectedIPs.add(\"IP$index\", $strSelectedIP)\n      }\n    }\n\n    #Last Usable IP\n    $strAzLastUsableIP = GetUsableIPByIndex $($AzSubnetSize + 3) # including the first 3 reserved IPs\n    Write-Verbose \"The Last usable IP for the Azure subnet is $strAzLastUsableIP\"\n\n\n    $DeploymentScriptOutputs = [ordered]@{}\n    if ($PSBoundParameters.ContainsKey('indexes')) {\n      $DeploymentScriptOutputs[\"SelectedIPs\"] = $htSelectedIPs\n    }\n    $DeploymentScriptOutputs['SubnetSize'] = $AzSubnetSize\n    $DeploymentScriptOutputs['GatewayIP'] = $strAzGWIP\n    $DeploymentScriptOutputs['DNSIP1'] = $strAzDNSIP1\n    $DeploymentScriptOutputs['DNSIP2'] = $strAzDNSIP2\n    $DeploymentScriptOutputs['FirstUsableIP'] = $strAzFirstUsableIP\n    $DeploymentScriptOutputs['LastUsableIP'] = $strAzLastUsableIP\n\n    $DeploymentScriptOutputs\n    #endregion\n    ",
+                "cleanupPreference": "OnSuccess",
+                "retentionInterval": "P1D"
+              }
+            }
+          ],
+          "outputs": {
+            "SelectedIPs": {
+              "type": "object",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.SelectedIPs]"
+            },
+            "SubnetSize": {
+              "type": "int",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.SubnetSize]"
+            },
+            "GatewayIP": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.GatewayIP]"
+            },
+            "DNSIP1": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.DNSIP1]"
+            },
+            "DNSIP2": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.DNSIP2]"
+            },
+            "FirstUsableIP": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.FirstUsableIP]"
+            },
+            "LastUsableIP": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Resources/deploymentScripts', 'azcidrhost')).outputs.LastUsableIP]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]",
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'deploymentScriptStorage')]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "ubuntu01",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('vmAdminUserName')]"
+          },
+          "adminPasswordOrKey": {
+            "value": "[parameters('vmAdminPassword')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName1')]"
+          },
+          "privateIP": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.SelectedIPs.value.IP3]"
+          },
+          "subnetId": {
+            "value": "[variables('subnetId')]"
+          },
+          "authenticationType": {
+            "value": "password"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "8644055811210398656"
+            }
+          },
+          "parameters": {
+            "vmName": {
+              "type": "string",
+              "defaultValue": "simpleLinuxVM",
+              "metadata": {
+                "description": "The name of you Virtual Machine."
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Username for the Virtual Machine."
+              }
+            },
+            "authenticationType": {
+              "type": "string",
+              "defaultValue": "password",
+              "allowedValues": [
+                "sshPublicKey",
+                "password"
+              ],
+              "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+              }
+            },
+            "adminPasswordOrKey": {
+              "type": "secureString",
+              "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+              }
+            },
+            "ubuntuOSVersion": {
+              "type": "string",
+              "defaultValue": "18.04-LTS",
+              "allowedValues": [
+                "12.04.5-LTS",
+                "14.04.5-LTS",
+                "16.04.0-LTS",
+                "18.04-LTS"
+              ],
+              "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmSize": {
+              "type": "string",
+              "defaultValue": "Standard_D2_v3",
+              "metadata": {
+                "description": "The size of the VM"
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Subnet resource Id"
+              }
+            },
+            "privateIP": {
+              "type": "string",
+              "metadata": {
+                "description": "Private IP address for the VM"
+              }
+            }
+          },
+          "functions": [],
+          "variables": {
+            "networkInterfaceName": "[format('{0}-nic1', parameters('vmName'))]",
+            "osDiskType": "Standard_LRS",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                    "keyData": "[parameters('adminPasswordOrKey')]"
+                  }
+                ]
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2020-06-01",
+              "name": "[variables('networkInterfaceName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Static",
+                      "privateIPAddress": "[parameters('privateIP')]"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "storageProfile": {
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "[variables('osDiskType')]"
+                    }
+                  },
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "[parameters('ubuntuOSVersion')]",
+                    "version": "latest"
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                    }
+                  ]
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPasswordOrKey')]",
+                  "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), null(), variables('linuxConfiguration'))]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "adminUsername": {
+              "type": "string",
+              "value": "[parameters('adminUsername')]"
+            },
+            "vmName": {
+              "type": "string",
+              "value": "[parameters('vmName')]"
+            },
+            "privateIPAddress": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))).ipConfigurations[0].properties.privateIPAddress]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    },
+    {
+      "type": "Microsoft.Resources/deployments",
+      "apiVersion": "2019-10-01",
+      "name": "ubuntu02",
+      "resourceGroup": "[variables('rgName')]",
+      "properties": {
+        "expressionEvaluationOptions": {
+          "scope": "inner"
+        },
+        "mode": "Incremental",
+        "parameters": {
+          "adminUsername": {
+            "value": "[parameters('vmAdminUserName')]"
+          },
+          "adminPasswordOrKey": {
+            "value": "[parameters('vmAdminPassword')]"
+          },
+          "location": {
+            "value": "[parameters('location')]"
+          },
+          "vmName": {
+            "value": "[parameters('vmName2')]"
+          },
+          "privateIP": {
+            "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.SelectedIPs.value.IP4]"
+          },
+          "subnetId": {
+            "value": "[variables('subnetId')]"
+          },
+          "authenticationType": {
+            "value": "password"
+          }
+        },
+        "template": {
+          "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
+          "contentVersion": "1.0.0.0",
+          "metadata": {
+            "_generator": {
+              "name": "bicep",
+              "version": "0.4.63.48766",
+              "templateHash": "8644055811210398656"
+            }
+          },
+          "parameters": {
+            "vmName": {
+              "type": "string",
+              "defaultValue": "simpleLinuxVM",
+              "metadata": {
+                "description": "The name of you Virtual Machine."
+              }
+            },
+            "adminUsername": {
+              "type": "string",
+              "metadata": {
+                "description": "Username for the Virtual Machine."
+              }
+            },
+            "authenticationType": {
+              "type": "string",
+              "defaultValue": "password",
+              "allowedValues": [
+                "sshPublicKey",
+                "password"
+              ],
+              "metadata": {
+                "description": "Type of authentication to use on the Virtual Machine. SSH key is recommended."
+              }
+            },
+            "adminPasswordOrKey": {
+              "type": "secureString",
+              "metadata": {
+                "description": "SSH Key or password for the Virtual Machine. SSH key is recommended."
+              }
+            },
+            "ubuntuOSVersion": {
+              "type": "string",
+              "defaultValue": "18.04-LTS",
+              "allowedValues": [
+                "12.04.5-LTS",
+                "14.04.5-LTS",
+                "16.04.0-LTS",
+                "18.04-LTS"
+              ],
+              "metadata": {
+                "description": "The Ubuntu version for the VM. This will pick a fully patched image of this given Ubuntu version."
+              }
+            },
+            "location": {
+              "type": "string",
+              "defaultValue": "[resourceGroup().location]",
+              "metadata": {
+                "description": "Location for all resources."
+              }
+            },
+            "vmSize": {
+              "type": "string",
+              "defaultValue": "Standard_D2_v3",
+              "metadata": {
+                "description": "The size of the VM"
+              }
+            },
+            "subnetId": {
+              "type": "string",
+              "metadata": {
+                "description": "Subnet resource Id"
+              }
+            },
+            "privateIP": {
+              "type": "string",
+              "metadata": {
+                "description": "Private IP address for the VM"
+              }
+            }
+          },
+          "functions": [],
+          "variables": {
+            "networkInterfaceName": "[format('{0}-nic1', parameters('vmName'))]",
+            "osDiskType": "Standard_LRS",
+            "linuxConfiguration": {
+              "disablePasswordAuthentication": true,
+              "ssh": {
+                "publicKeys": [
+                  {
+                    "path": "[format('/home/{0}/.ssh/authorized_keys', parameters('adminUsername'))]",
+                    "keyData": "[parameters('adminPasswordOrKey')]"
+                  }
+                ]
+              }
+            }
+          },
+          "resources": [
+            {
+              "type": "Microsoft.Network/networkInterfaces",
+              "apiVersion": "2020-06-01",
+              "name": "[variables('networkInterfaceName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "ipConfigurations": [
+                  {
+                    "name": "ipconfig1",
+                    "properties": {
+                      "subnet": {
+                        "id": "[parameters('subnetId')]"
+                      },
+                      "privateIPAllocationMethod": "Static",
+                      "privateIPAddress": "[parameters('privateIP')]"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "type": "Microsoft.Compute/virtualMachines",
+              "apiVersion": "2020-06-01",
+              "name": "[parameters('vmName')]",
+              "location": "[parameters('location')]",
+              "properties": {
+                "hardwareProfile": {
+                  "vmSize": "[parameters('vmSize')]"
+                },
+                "storageProfile": {
+                  "osDisk": {
+                    "createOption": "FromImage",
+                    "managedDisk": {
+                      "storageAccountType": "[variables('osDiskType')]"
+                    }
+                  },
+                  "imageReference": {
+                    "publisher": "Canonical",
+                    "offer": "UbuntuServer",
+                    "sku": "[parameters('ubuntuOSVersion')]",
+                    "version": "latest"
+                  }
+                },
+                "networkProfile": {
+                  "networkInterfaces": [
+                    {
+                      "id": "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+                    }
+                  ]
+                },
+                "osProfile": {
+                  "computerName": "[parameters('vmName')]",
+                  "adminUsername": "[parameters('adminUsername')]",
+                  "adminPassword": "[parameters('adminPasswordOrKey')]",
+                  "linuxConfiguration": "[if(equals(parameters('authenticationType'), 'password'), null(), variables('linuxConfiguration'))]"
+                }
+              },
+              "dependsOn": [
+                "[resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))]"
+              ]
+            }
+          ],
+          "outputs": {
+            "adminUsername": {
+              "type": "string",
+              "value": "[parameters('adminUsername')]"
+            },
+            "vmName": {
+              "type": "string",
+              "value": "[parameters('vmName')]"
+            },
+            "privateIPAddress": {
+              "type": "string",
+              "value": "[reference(resourceId('Microsoft.Network/networkInterfaces', variables('networkInterfaceName'))).ipConfigurations[0].properties.privateIPAddress]"
+            }
+          }
+        }
+      },
+      "dependsOn": [
+        "[extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip')]",
+        "[subscriptionResourceId('Microsoft.Resources/resourceGroups', variables('rgName'))]"
+      ]
+    }
+  ],
+  "outputs": {
+    "SelectedIPs": {
+      "type": "object",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.SelectedIPs.value]"
+    },
+    "SubnetSize": {
+      "type": "int",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.SubnetSize.value]"
+    },
+    "GatewayIP": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.GatewayIP.value]"
+    },
+    "DNSIP1": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.DNSIP1.value]"
+    },
+    "DNSIP2": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.DNSIP2.value]"
+    },
+    "FirstUsableIP": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.FirstUsableIP.value]"
+    },
+    "LastUsableIP": {
+      "type": "string",
+      "value": "[reference(extensionResourceId(format('/subscriptions/{0}/resourceGroups/{1}', subscription().subscriptionId, variables('rgName')), 'Microsoft.Resources/deployments', 'private_ip'), '2019-10-01').outputs.LastUsableIP.value]"
+    },
+    "subnetId": {
+      "type": "string",
+      "value": "[variables('subnetId')]"
+    },
+    "subnetAddressPrefix": {
+      "type": "string",
+      "value": "[reference(variables('subnetId'), '2020-07-01', 'Full').properties.addressPrefix]"
+    }
+  }
+}
