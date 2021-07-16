@@ -5,8 +5,9 @@ param location string = 'australia east'
 param vnetRG string
 param vnetName string
 param subnetName string
-param vmIpIndex int = 3
-param vmName string
+param vmIpIndexes string = '3,4'
+param vmName1 string
+param vmName2 string
 param vmAdminUserName string
 
 @secure()
@@ -31,41 +32,55 @@ module storage_account './storage-account.bicep' = {
   }
 }
 
-module ubuntu01_private_ip_deployment_script './azcidrhost-function.bicep' = {
-  name: 'ubuntu01_private_ip'
+module private_ip_deployment_script './azcidrhost-function.bicep' = {
+  name: 'private_ip'
   scope: resourceGroup(rg.name)
   params: {
     location: location
     addressPrefix: subnetAddressPrefix
-    ipIndex: vmIpIndex
+    ipIndexes: vmIpIndexes
     storageAccountName: storage_account.outputs.name
     storageAccountId: storage_account.outputs.id
     storageAccountApiVersion: storage_account.outputs.apiVersion
   }
 }
 
-module ubuntu_vm './vm-ubuntu.bicep' = {
+module ubuntu_vm_01 './vm-ubuntu.bicep' = {
   name: 'ubuntu01'
   scope: resourceGroup(rg.name)
   params: {
     adminUsername: vmAdminUserName
     adminPasswordOrKey: vmAdminPassword
     location: location
-    vmName: vmName
-    privateIP: ubuntu01_private_ip_deployment_script.outputs.SelectedIP
+    vmName: vmName1
+    privateIP: private_ip_deployment_script.outputs.SelectedIPs.IP3
     subnetId: subnetId
     authenticationType: 'password'
   }
 }
 
-output SelectedIP string = ubuntu01_private_ip_deployment_script.outputs.SelectedIP
-output SubnetSize int = ubuntu01_private_ip_deployment_script.outputs.SubnetSize
-output GatewayIP string = ubuntu01_private_ip_deployment_script.outputs.GatewayIP
-output DNSIP1 string = ubuntu01_private_ip_deployment_script.outputs.DNSIP1
-output DNSIP2 string = ubuntu01_private_ip_deployment_script.outputs.DNSIP2
-output FirstUsableIP string = ubuntu01_private_ip_deployment_script.outputs.FirstUsableIP
-output LastUsableIP string = ubuntu01_private_ip_deployment_script.outputs.LastUsableIP
+module ubuntu_vm_02 './vm-ubuntu.bicep' = {
+  name: 'ubuntu02'
+  scope: resourceGroup(rg.name)
+  params: {
+    adminUsername: vmAdminUserName
+    adminPasswordOrKey: vmAdminPassword
+    location: location
+    vmName: vmName2
+    privateIP: private_ip_deployment_script.outputs.SelectedIPs.IP4
+    subnetId: subnetId
+    authenticationType: 'password'
+  }
+}
+
+output SelectedIPs object = private_ip_deployment_script.outputs.SelectedIPs
+output SubnetSize int = private_ip_deployment_script.outputs.SubnetSize
+output GatewayIP string = private_ip_deployment_script.outputs.GatewayIP
+output DNSIP1 string = private_ip_deployment_script.outputs.DNSIP1
+output DNSIP2 string = private_ip_deployment_script.outputs.DNSIP2
+output FirstUsableIP string = private_ip_deployment_script.outputs.FirstUsableIP
+output LastUsableIP string = private_ip_deployment_script.outputs.LastUsableIP
 
 output subnetId string = subnetId
 output subnetAddressPrefix string = subnetAddressPrefix
-output vmPrivateIp string = ubuntu_vm.outputs.privateIPAddress
+//output vmPrivateIp string = ubuntu_vm.outputs.privateIPAddress

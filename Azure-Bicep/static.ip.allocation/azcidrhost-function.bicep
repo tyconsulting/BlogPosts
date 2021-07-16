@@ -1,20 +1,14 @@
 param location string
 param utcValue string = utcNow()
 param addressPrefix string
-param ipIndex int
-//param uamiId string
+param ipIndexes string
 param storageAccountName string
 param storageAccountId string
 param storageAccountApiVersion string
+
 resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = {
   name: 'azcidrhost'
   location: location
-  /*identity: {
-    type: 'UserAssigned'
-    userAssignedIdentities: {
-      '${uamiId}': {}
-    }
-  }*/
   kind: 'AzurePowerShell'
   properties: {
     forceUpdateTag: utcValue
@@ -24,15 +18,24 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       storageAccountName: storageAccountName
       storageAccountKey: listKeys(storageAccountId, storageAccountApiVersion).keys[0].value
     }
-    arguments: '-addressPrefix \'${addressPrefix}\' -index ${ipIndex}'
+    arguments: '-addressPrefix \'${addressPrefix}\' -indexes ${ipIndexes}'
     scriptContent: '''
+    [CmdletBinding()]
     Param (
       [Parameter(Mandatory = $true, Position = 0)][string]$addressPrefix,
-      [Parameter(Mandatory = $false, Position = 1)][int]$index
+      [Parameter(Mandatory = $false, Position = 1)]$indexes
     )
-    #Note: 5 IPs reserved by Azure https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets
 
-    
+    <#
+    Note: https://docs.microsoft.com/en-us/azure/virtual-network/virtual-networks-faq#are-there-any-restrictions-on-using-ip-addresses-within-these-subnets
+    - 5 IPs reserved by Azure
+      - x.x.x.0: Network address
+      - x.x.x.1: Reserved by Azure for the default gateway
+      - x.x.x.2, x.x.x.3: Reserved by Azure to map the Azure DNS IPs to the VNet space
+      - x.x.x.255: Network broadcast address
+    #>
+    #region Functions
+
     function ValidateAzAddressPrefix ($addressPrefix) {
       $NetworkID = $addressPrefix.split("/")[0]
       [int]$CIDR = $addressPrefix.split("/")[1]
@@ -40,12 +43,12 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))
       
       $bValidAddressPrefix = $true
-    
+
       # 1. make sure CIDR notation value is between 1 and 29
       if ($CIDR -lt 1 -or $CIDR -gt 29) {
         $bValidAddressPrefix = $false
       }
-    
+
       # 2. make sure the address space must contain all "0"
       # network prefix length must equals, address space section must contain all "0"
       if ($script:binIPAddressSection -notmatch "^0{$(32-$CIDR)}$") {
@@ -78,7 +81,7 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       
       $bValidIP
     }
-    
+
     function ConvertToBinary ($strDecimal) {
       $strBinary = [Convert]::ToString($strDecimal, 2)
       if ($strBinary.length -lt 8) {
@@ -103,7 +106,7 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       }
       $strBinaryIP
     }
-    
+
     Function ConvertBinaryToIP ($script:binIP) {
       $FirstSection = [Convert]::ToInt64(($script:binIP.substring(0, 8)), 2)
       $SecondSection = [Convert]::ToInt64(($script:binIP.substring(8, 8)), 2)
@@ -112,7 +115,7 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       $strIP = "$FirstSection`.$SecondSection`.$ThirdSection`.$FourthSection"
       $strIP
     }
-    
+
     Function GetUsableIPByIndex ($index) {
       $binIndex = [convert]::ToString($index, 2) 
       $indexIPReplaceStr = ""
@@ -127,7 +130,18 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       $indexIP = ConvertBinaryToIP $BinIndexAddress
       $indexIP
     }
-    
+    #endregion
+
+    #region Main
+    $arrIndexes = @()
+    if ($PSBoundParameters.ContainsKey("indexes")) {
+      foreach ($item in $indexes) {
+        $arrIndexes += [int]::Parse($item)
+      }
+    }
+    $arrIndexes = $indexes -split (',')
+    Write-Verbose $addressPrefix
+
     #validation
     #validating AddressPrefix
     Write-Verbose "Validating $addressPrefix"
@@ -135,47 +149,66 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
       Throw "Invalid Network CIDR specified."
       Exit -1
     }
-    
+    else {
+      Write-verbose "Network ID $addressPrefix is valid"
+    }
+
     $NetworkID = $addressPrefix.split("/")[0]
     [int]$CIDR = $addressPrefix.split("/")[1]
     $iAddressWidth = [System.Math]::Pow(2, $(32 - $CIDR))
     [int]$AzSubnetSize = $iAddressWidth - 5 # 5 IPs are reserved by Azure
-    
+
     #Validating IP index (the index number must no exceed the total available IPs in the subnet)
-    if ($PSBoundParameters.ContainsKey('index')) {
-      If ($index -gt $AzSubnetSize) {
-        Throw "There are $AzSubnetSize usable IPs in the subnet $addressPrefix. The index number must no exceed the total available usable IPs in the subnet."
-        exit -1
+    if ($PSBoundParameters.ContainsKey('indexes')) {
+      foreach ($index in $arrIndexes) {
+        If ([int]$index -gt $AzSubnetSize) {
+          Throw "There are $AzSubnetSize usable IPs in the subnet $addressPrefix. The index number $index must no exceed the total available usable IPs in the subnet."
+          #exit -1
+        }
       }
     }
-    
+
+    Write-Verbose "There are $AzSubnetSize usable IPs in Azure subnet $addressPrefix"
+
     $script:binIP = (ConvertIPToBinary $NetworkID).Replace(".", "")
     $script:binIPNetworkSection = $script:binIP.substring(0, $CIDR)
     $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))
       
     #Azure Gateway IP
     $strAzGWIP = GetUsableIPByIndex 1
-    
+    Write-Verbose "The gateway IP for the Azure subnet is $strAzGWIP"
+
     #Azure DNS Server IP #1
     $strAzDNSIP1 = GetUsableIPByIndex 2
-    
+    Write-Verbose "The 1st DNS server IP for the Azure subnet is $strAzDNSIP1"
+
     #Azure DNS Server IP #2
     $strAzDNSIP2 = GetUsableIPByIndex 3
-    
+    Write-Verbose "The 2nd DNS server IP for the Azure subnet is $strAzDNSIP2"
+
     #First Usable IP
     $strAzFirstUsableIP = GetUsableIPByIndex 4 # excluding the first 3 reserved IPs
-    
-    if ($PSBoundParameters.ContainsKey('index')) {
-      #Index IP (The No. of USABLE IP)
-      $strSelectedIP = GetUsableIPByIndex $($index + 3) # considering the first 3 IPs in a subnet is reserved
+    Write-Verbose "The First usable IP for the Azure subnet is $strAzFirstUsableIP"
+
+    if ($PSBoundParameters.ContainsKey('indexes')) {
+      $htSelectedIPs = @{}
+      foreach ($index in $arrIndexes) {
+        #Index IP (The No. of USABLE IP)
+        $usableIndex = [int]$index + 3 # considering the first 3 IPs in a subnet is reserved
+        $strSelectedIP = GetUsableIPByIndex $usableIndex
+        Write-Verbose "The select IP address for index $index is $strSelectedIP"
+        $htSelectedIPs.add("IP$index", $strSelectedIP)
+      }
     }
-    
+
     #Last Usable IP
     $strAzLastUsableIP = GetUsableIPByIndex $($AzSubnetSize + 3) # including the first 3 reserved IPs
-    
+    Write-Verbose "The Last usable IP for the Azure subnet is $strAzLastUsableIP"
+
+
     $DeploymentScriptOutputs = [ordered]@{}
-    if ($PSBoundParameters.ContainsKey('index')) {
-      $DeploymentScriptOutputs['SelectedIP'] = $strSelectedIP
+    if ($PSBoundParameters.ContainsKey('indexes')) {
+      $DeploymentScriptOutputs["SelectedIPs"] = $htSelectedIPs
     }
     $DeploymentScriptOutputs['SubnetSize'] = $AzSubnetSize
     $DeploymentScriptOutputs['GatewayIP'] = $strAzGWIP
@@ -183,14 +216,15 @@ resource azcidrhost_script 'Microsoft.Resources/deploymentScripts@2020-10-01' = 
     $DeploymentScriptOutputs['DNSIP2'] = $strAzDNSIP2
     $DeploymentScriptOutputs['FirstUsableIP'] = $strAzFirstUsableIP
     $DeploymentScriptOutputs['LastUsableIP'] = $strAzLastUsableIP
-    
+
     $DeploymentScriptOutputs
+    #endregion
     '''
     cleanupPreference: 'OnSuccess'
     retentionInterval: 'P1D'
   }
 }
-output SelectedIP string = azcidrhost_script.properties.outputs.SelectedIP
+output SelectedIPs object = azcidrhost_script.properties.outputs.SelectedIPs
 output SubnetSize int = azcidrhost_script.properties.outputs.SubnetSize
 output GatewayIP string = azcidrhost_script.properties.outputs.GatewayIP
 output DNSIP1 string = azcidrhost_script.properties.outputs.DNSIP1

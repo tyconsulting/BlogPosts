@@ -1,7 +1,7 @@
 [CmdletBinding()]
 Param (
   [Parameter(Mandatory = $true, Position = 0)][string]$addressPrefix,
-  [Parameter(Mandatory = $false, Position = 1)][int[]]$indexes
+  [Parameter(Mandatory = $false, Position = 1)]$indexes
 )
 
 <#
@@ -111,6 +111,13 @@ Function GetUsableIPByIndex ($index) {
 #endregion
 
 #region Main
+$arrIndexes = @()
+if ($PSBoundParameters.ContainsKey("indexes")) {
+  foreach ($item in $indexes) {
+    $arrIndexes += [int]::Parse($item)
+  }
+}
+$arrIndexes = $indexes -split (',')
 Write-Verbose $addressPrefix
 
 #validation
@@ -131,10 +138,10 @@ $iAddressWidth = [System.Math]::Pow(2, $(32 - $CIDR))
 
 #Validating IP index (the index number must no exceed the total available IPs in the subnet)
 if ($PSBoundParameters.ContainsKey('indexes')) {
-  foreach ($index in $indexes) {
-    If ($index -gt $AzSubnetSize) {
+  foreach ($index in $arrIndexes) {
+    If ([int]$index -gt $AzSubnetSize) {
       Throw "There are $AzSubnetSize usable IPs in the subnet $addressPrefix. The index number $index must no exceed the total available usable IPs in the subnet."
-      exit -1
+      #exit -1
     }
   }
 }
@@ -162,20 +169,13 @@ $strAzFirstUsableIP = GetUsableIPByIndex 4 # excluding the first 3 reserved IPs
 Write-Verbose "The First usable IP for the Azure subnet is $strAzFirstUsableIP"
 
 if ($PSBoundParameters.ContainsKey('indexes')) {
-  $arrSelectedIPs = @()
-  foreach ($index in $indexes) {
+  $htSelectedIPs = @{}
+  foreach ($index in $arrIndexes) {
     #Index IP (The No. of USABLE IP)
-    $strSelectedIP = GetUsableIPByIndex $($index + 3) # considering the first 3 IPs in a subnet is reserved
-    Write-Verbose "The select IP address is $strSelectedIP"
-    $arrSelectedIPs = @()
-    foreach ($index in $indexes) {
-      $strSelectedIP = GetUsableIPByIndex $($index + 3) # considering the first 3 IPs in a subnet is reserved
-      Write-Verbose "The select IP address for index $index is $strSelected"
-      $arrSelectedIPs += @{
-        'index' = $index
-        'ip'    = $strSelectedIP
-      }
-    }
+    $usableIndex = [int]$index + 3 # considering the first 3 IPs in a subnet is reserved
+    $strSelectedIP = GetUsableIPByIndex $usableIndex
+    Write-Verbose "The select IP address for index $index is $strSelectedIP"
+    $htSelectedIPs.add("IP$index", $strSelectedIP)
   }
 }
 
@@ -186,9 +186,7 @@ Write-Verbose "The Last usable IP for the Azure subnet is $strAzLastUsableIP"
 
 $DeploymentScriptOutputs = [ordered]@{}
 if ($PSBoundParameters.ContainsKey('indexes')) {
-  foreach ($item in $arrSelectedIPs) {
-    $DeploymentScriptOutputs["SelectedIP$($item.index)"] = $item.ip
-  }
+  $DeploymentScriptOutputs["SelectedIPs"] = $htSelectedIPs
 }
 $DeploymentScriptOutputs['SubnetSize'] = $AzSubnetSize
 $DeploymentScriptOutputs['GatewayIP'] = $strAzGWIP
