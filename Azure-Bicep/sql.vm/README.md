@@ -8,7 +8,7 @@ Bicep modules and sample templates for deploying standalone Azure SQL VMs as wel
 
 ### Template
 
-* **[sql-vm.bicep](./sql-vm.bicep)**: Bicep template to deploy one or more Azure SQL VMs and all related resources either as standalone SQL servers (not clustered) or fully functioning clustered SQL VMs with SQL Always-On Availability Group (AOAG).
+* **[main.bicep](./main.bicep)**: Bicep template to deploy one or more Azure SQL VMs and all related resources either as standalone SQL servers (not clustered) or fully functioning clustered SQL VMs with SQL Always-On Availability Group (AOAG).
 
 ### Modules
 
@@ -24,7 +24,7 @@ The following modules are located in the **[modules](./modules)** folder.
 
 ### Template Parameters
 
-The following Parameters must be specified for the [sql-vm.bicep](./sql-vm.bicep) template:
+The following Parameters must be specified for the [main.bicep](./main.bicep) template:
 
 | Name | Type | Mandatory | Default Value | Description |
 | ---- | ---- | --------- | ------------- | ----------- |
@@ -37,7 +37,7 @@ The following Parameters must be specified for the [sql-vm.bicep](./sql-vm.bicep
 | virtualMachineNamePrefix | string | Yes | N/A | Virtual Machine name prefix. A sequence number will be appended to create unique names |
 | virtualMachineSize | string | Yes | N/A | Size for the Azure Virtual Machines |
 | osDiskType | string | Yes | N/A | Azure SQL Virtual Machines OS Disk type |
-| dataDisks | array | No | *refer to the **dataDisks** parameter in [sql-vm.bicep](./sql-vm.bicep) template* | data disk configurations for the Azure Virtual Machines |
+| dataDisks | array | No | *refer to the **dataDisks** parameter in [main.bicep](./main.bicep) template* | data disk configurations for the Azure Virtual Machines |
 | sqlServerImageType | string | Yes | N/A | Select the version of SQL Server Image type |
 | sqlImageSku | String | Yes | N/A | SQL Server Image SKU. Choose between Developer and Enterprise |
 | domainJoinUserName | sting | Yes | N/A | Domain NetBiosName plus User name of a domain user with sufficient rights to perform domain join operation. E.g. domain\username' |
@@ -86,7 +86,7 @@ The following Parameters must be specified for the [sql-vm.bicep](./sql-vm.bicep
 | sqlClusterOperatorAccountPassword | secureString | No | N/A | password for the cluster operator account. Only required when deploying a SQL cluster. |
 | sqlServiceAccountPassword | secureString | No | N/A | password for the sql service account. Only required when deploying a SQL cluster. |
 | availabilityGroupName | string | No | N/A | Specify the name of SQL Availability Group for which listener is being created. Only required when deploying a SQL cluster. | 
-| AGReplica | array | No | *refer to the **AGReplica** parameter in [sql-vm.bicep](./sql-vm.bicep) template* | Specify the AG replica configuration. Only required when deploying a SQL cluster. |
+| AGReplica | array | No | *refer to the **AGReplica** parameter in [main.bicep](./main.bicep) template* | Specify the AG replica configuration. Only required when deploying a SQL cluster. |
 | Listener | string | No | aglistener | Specify a name for the listener for SQL Availability Group. Only required when deploying a SQL cluster. |
 | ListenerPort | int | No | 1433 | Specify the port for listener |
 | ListenerIp | string | No | N/A | Specify the available private IP address for the listener from the subnet the existing Vms are part of. Only required when deploying a SQL cluster. |
@@ -108,10 +108,10 @@ rg="rg-sql-vm-1"
 az group create --name $rg --location australiaeast
 
 # what-if
-az deployment group what-if --resource-group $rg --template-file sql-vm.bicep --parameters cluster.parameters.json
+az deployment group what-if --resource-group $rg --template-file main.bicep --parameters cluster.parameters.json
 
 #deploy
-az deployment group create --name 'sql-vm-cluster' --resource-group $rg --template-file sql-vm.bicep --parameters cluster.parameters.json --verbose
+az deployment group create --name 'sql-vm-cluster' --resource-group $rg --template-file main.bicep --parameters cluster.parameters.json --verbose
 ```
 
 ### Deploy Standalone SQL VM
@@ -122,10 +122,10 @@ rg="rg-sql-vm-1"
 az group create --name $rg --location australiaeast
 
 # what-if
-az deployment group what-if --resource-group $rg --template-file sql-vm.bicep --parameters standalone.parameters.json
+az deployment group what-if --resource-group $rg --template-file main.bicep --parameters standalone.parameters.json
 
 #deploy
-az deployment group create --name 'sql-vm-standalone' --resource-group $rg --template-file sql-vm.bicep --parameters standalone.parameters.json --verbose
+az deployment group create --name 'sql-vm-standalone' --resource-group $rg --template-file main.bicep --parameters standalone.parameters.json --verbose
 ```
 
 ### Features Not Implemented
