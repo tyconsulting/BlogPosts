@@ -4,6 +4,8 @@
 
 Bicep modules and sample templates for deploying standalone Azure SQL VMs as well as Azure SQL VM Clusters.
 
+This is a part of the blog post **[Azure SQL Virtual Machines - Sharing My Code and Experience](https://blog.tyang.org/2022/01/13/azure-sql-vm)**
+
 ## Bicep Files
 
 ### Template
