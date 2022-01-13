@@ -1,0 +1,211 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "vnetResourceGroup": {
+      "value": "<vnet-resource-group>"
+    },
+    "vnetName": {
+      "value": "<vnet-name>"
+    },
+    "subnetName": {
+      "value": "<subnet-name>"
+    },
+    "VirtualMachineCount": {
+      "value": 1
+    },
+    "virtualMachineNamePrefix": {
+      "value": "vm-db-std"
+    },
+    "virtualMachineSize": {
+      "value": "Standard_D8s_v3"
+    },
+    "osDiskType": {
+      "value": "Premium_LRS"
+    },
+    "dataDisks": {
+      "value": [
+        {
+          "createOption": "empty",
+          "caching": "ReadOnly",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 64
+        },
+        {
+          "createOption": "empty",
+          "caching": "ReadOnly",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 64
+        },
+        {
+          "createOption": "empty",
+          "caching": "None",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 32
+        },
+        {
+          "createOption": "empty",
+          "caching": "None",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 32
+        },
+        {
+          "createOption": "empty",
+          "caching": "ReadOnly",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 32
+        },
+        {
+          "createOption": "empty",
+          "caching": "ReadOnly",
+          "writeAcceleratorEnabled": false,
+          "storageAccountType": "Premium_LRS",
+          "diskSizeGB": 32
+        }
+      ]
+    },
+    "sqlServerImageType": {
+      "value": "SQL2017-WS2016"
+    },
+    "sqlImageSku": {
+      "value": "Enterprise"
+    },
+    "enableAcceleratedNetworking": {
+      "value": true
+    },
+    "domainFQDN": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "domainFQDN"
+      }
+    },
+    "domainJoinUserName": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "domainJoinUserName"
+      }
+    },
+    "domainJoinUserPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "domainJoinUserPassword"
+      }
+    },
+    "adminUsername": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "adminUsername"
+      }
+    },
+    "adminPassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "adminPassword"
+      }
+    },
+    "sqlConnectivityType": {
+      "value": "PRIVATE"
+    },
+    "sqlPortNumber": {
+      "value": 1433
+    },
+    "sqlStorageWorkloadType": {
+      "value": "OLTP"
+    },
+    "sqlServerLicenseType": {
+      "value": "AHUB"
+    },
+    "enableAkvEkm": {
+      "value": true
+    },
+    "ekmAkvName": {
+      "value": "<ekm-kv-name>"
+    },
+    "sqlAkvPrincipalName": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "sqlAkvPrincipalName"
+      }
+    },
+    "sqlAkvPrincipalSecret": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "sqlAkvPrincipalSecret"
+      }
+    },
+    "dataPath": {
+      "value": "F:\\SQLData"
+    },
+    "dataDisksLUNs": {
+      "value": [
+        0,
+        1
+      ]
+    },
+    "logPath": {
+      "value": "G:\\SQLLog"
+    },
+    "logDisksLUNs": {
+      "value": [
+        2,
+        3
+      ]
+    },
+    "tempDBPath": {
+      "value": "H:\\SQLTemp"
+    },
+    "tempDBDisksLUNs": {
+      "value": [
+        4,
+        5
+      ]
+    },
+    "sqlAuthUpdateUserName": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "sqlAuthUpdateUserName"
+      }
+    },
+    "sqlAuthUpdatePassword": {
+      "reference": {
+        "keyVault": {
+          "id": "/subscriptions/<subscription-id>/resourceGroups/<resource-group>/providers/Microsoft.KeyVault/vaults/<keyvault-name>"
+        },
+        "secretName": "sqlAuthUpdatePassword"
+      }
+    },
+    "enableAutoBackup": {
+      "value": true
+    },
+    "rServicesEnabled": {
+      "value": false
+    },
+    "ouPath": {
+      "value": ""
+    },
+    "autoBackupStorageAccountName": {
+      "value": "<backup-storage-account-name>"
+    }
+  }
+}
