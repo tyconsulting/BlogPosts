@@ -1,0 +1,31 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "testBash"
+    },
+    "vmName1": {
+      "value": "vm-ubuntu-01"
+    },
+    "vmName2": {
+      "value": "vm-ubuntu-02"
+    },
+    "asyncExecution": {
+      "value": false
+    },
+    "errorBlobContainerUri": {
+      "value": "https://sataovmruncmd01.blob.core.windows.net/error"
+    },
+    "outputBlobContainerUri": {
+      "value": "https://sataovmruncmd01.blob.core.windows.net/output"
+    },
+    "scriptParameters": {
+      "value": [
+        {
+          "value": "eth0"
+        }
+      ]
+    }
+  }
+}

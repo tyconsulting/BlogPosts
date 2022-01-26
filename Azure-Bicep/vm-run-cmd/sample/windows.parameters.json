@@ -1,0 +1,32 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "name": {
+      "value": "testPwsh"
+    },
+    "vmName1": {
+      "value": "vm-db-std-1"
+    },
+    "vmName2": {
+      "value": "vm-db-std-2"
+    },
+    "asyncExecution": {
+      "value": false
+    },
+    "errorBlobContainerUri": {
+      "value": "https://sataovmruncmd01.blob.core.windows.net/error"
+    },
+    "outputBlobContainerUri": {
+      "value": "https://sataovmruncmd01.blob.core.windows.net/output"
+    },
+    "scriptParameters": {
+      "value": [
+        {
+          "name": "content",
+          "value": "Hello World"
+        }
+      ]
+    }
+  }
+}
