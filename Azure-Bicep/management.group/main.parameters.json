@@ -1,0 +1,84 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "template": "./main.json"
+  },
+  "parameters": {
+    "tier1MgmtGroups": {
+      "value": [
+        {
+          "id": "TYANG",
+          "displayName": "TYANG MGMT Root"
+        }
+      ]
+    },
+    "tier2MgmtGroups": {
+      "value": [
+        {
+          "id": "TYANG-Platform",
+          "displayName": "Platform Management",
+          "parentId": "TYANG"
+        },
+        {
+          "id": "TYANG-LandingZones",
+          "displayName": "Landing Zones",
+          "parentId": "TYANG"
+        },
+        {
+          "id": "TYANG-Sandbox",
+          "displayName": "Sandbox",
+          "parentId": "TYANG"
+        },
+        {
+          "id": "TYANG-Quarantine",
+          "displayName": "Quarantine",
+          "parentId": "TYANG"
+        },
+        {
+          "id": "TYANG-Decommissioned",
+          "displayName": "Decommissioned",
+          "parentId": "TYANG"
+        }
+      ]
+    },
+    "tier3MgmtGroups": {
+      "value": [
+        {
+          "id": "TYANG-Platform-Connectivity",
+          "displayName": "Connectivity",
+          "parentId": "TYANG-Platform"
+        },
+        {
+          "id": "TYANG-Platform-Identity",
+          "displayName": "Identity",
+          "parentId": "TYANG-Platform"
+        },
+        {
+          "id": "TYANG-Platform-Management",
+          "displayName": "Management",
+          "parentId": "TYANG-Platform"
+        },
+        {
+          "id": "TYANG-LandingZones-Corp",
+          "displayName": "Corp",
+          "parentId": "TYANG-LandingZones"
+        },
+        {
+          "id": "TYANG-LandingZones-Online",
+          "displayName": "Online",
+          "parentId": "TYANG-LandingZones"
+        }
+      ]
+    },
+    "authForNewMG": {
+      "value": true
+    },
+    "defaultMgId": {
+      "value": "TYANG-Quarantine"
+    },
+    "configMGSettings": {
+      "value": true
+    }
+  }
+}
