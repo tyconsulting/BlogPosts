@@ -9,13 +9,8 @@ parameters:
   default: "refs/heads/main"
 
 stages:
-- stage: branch_policy_build_validatioin
+- stage: branch_policy_build_validation
   displayName: "Branch Policy Build Validation"
-  variables:
-    - name: PSRULE_CONFIGURATION_AZURE_BICEP_FILE_EXPANSION
-      value: true
-    - name: PSRULE_INPUT_PATHIGNORE
-      value: bicepconfig.json;modules/
   jobs:
   - job: source_branch_validation
     displayName: Source Branch Validation
