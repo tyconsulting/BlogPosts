@@ -1,0 +1,7 @@
+name: $(BuildDefinitionName)_$(SourceBranchName)_$(Date:yyyyMMdd)$(Rev:.r)
+trigger: none
+
+stages:
+  - template: templates/template-branch-policy-validation.yml
+    parameters:
+      allowedSourceBranchName: "main"
