@@ -244,3 +244,6 @@ ModelManifest.xml
 # FAKE - F# Make
 .fake/
 .DS_Store
+
+#test Bicep parameter files
+main.parameters.test.json

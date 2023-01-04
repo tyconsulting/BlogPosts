@@ -1,0 +1,26 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "template": "./main.bicep"
+  },
+  "parameters": {
+    "tags": {
+      "value": {
+        "CostCentre": "1234"
+      }
+    },
+    "storageAccountName": {
+      "value": "<storage-account-name>"
+    },
+    "blobPrivateEndpointIP": {
+      "value": "10.101.2.10"
+    },
+    "dfsPrivateEndpointIP": {
+      "value": "10.101.2.11"
+    },
+    "subnetId": {
+      "value": "/subscriptions/<sub-id>/resourceGroups/<rg-name>/providers/Microsoft.Network/virtualNetworks/<vnet-name>/subnets/<subnet-name>"
+    }
+  }
+}
