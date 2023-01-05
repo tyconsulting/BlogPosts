@@ -237,10 +237,8 @@ resource relayPE 'Microsoft.Network/privateEndpoints@2022-01-01' = {
   }
 }
 
-resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' = {
+resource privateDnsZone 'Microsoft.Network/privateDnsZones@2020-06-01' existing = {
   name: privateDnsZoneName
-  tags: tagName
-  location: 'global'
 }
 
 resource privateDnsZoneARecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' = {
@@ -255,21 +253,7 @@ resource privateDnsZoneARecord 'Microsoft.Network/privateDnsZones/A@2020-06-01' 
     ]
   }
 }
-//private dns zone link uncomment if it's not previously configured
-/*
-resource privateDnsZoneVnetLink 'Microsoft.Network/privateDnsZones/virtualNetworkLinks@2020-06-01' = {
-  parent: privateDnsZone
-  name: relayNamespaceName
-  tags: tagName
-  location: 'global'
-  properties: {
-    registrationEnabled: false
-    virtualNetwork: {
-      id: existingVNET.id
-    }
-  }
-}
-*/
+
 output vnetId string = vnetResourceId
 output containerSubnetId string = containerSubnet.id
 output relayNamespaceId string = relayNamespace.id
