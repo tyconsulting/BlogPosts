@@ -28,10 +28,6 @@ param containerSubnetAddressPrefix string
 @description('Name of Cloud Shell Storage Account')
 param cloudShellStorageAccountName string
 
-/*
-@description('The static privavte IP address for the Storage Account File Service.')
-param cloudShellStorageAccountFilePEIPAddress string
-*/
 @description('Name of the resource tag.')
 param tagName object = {
   Environment: 'cloudshell'
@@ -44,8 +40,6 @@ var privateDnsZoneName = ((toLower(environment().name) == 'azureusgovernment') ?
 var vnetResourceId = resourceId('Microsoft.Network/virtualNetworks', existingVNETName)
 var relayPrivateEndpointName = 'pe-${relayNamespaceName}'
 var relayPrivateEndpointCustomNetworkInterfaceName = 'nic-pe-${relayNamespaceName}'
-//var filePrivateEndpointName = 'pe-${cloudShellStorageAccountName}-file'
-//var filePrivateEndpointNicName = 'nic-pe-${cloudShellStorageAccountName}-file'
 resource existingVNET 'Microsoft.Network/virtualNetworks@2021-08-01' existing = {
   name: existingVNETName
 
