@@ -1,0 +1,5 @@
+{
+  "itemDisplayName": "VNet Integrated Cloud Shell Template",
+  "description": "This template is used to deploy a Resource Group with a VNet Integrated Cloud Shell in one of the Connectivity subscriptions.",
+  "summary": "Deploys VNet Integrated Cloud Shell pattern. Values for all the parameters in the parameter file must be specified."
+}

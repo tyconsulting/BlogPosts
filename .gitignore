@@ -245,5 +245,6 @@ ModelManifest.xml
 .fake/
 .DS_Store
 
-#test Bicep parameter files
+#test files
 main.parameters.test.json
+test.md
