@@ -1,3 +1,14 @@
+#requires -Modules @{ModuleName='Az.Accounts';ModuleVersion='2.2.0'}
+
+<#
+===================================================================================================
+AUTHOR: Tao Yang
+DATE: 12/09/2022
+NAME: pipeline-aad-lookup.ps1
+VERSION: 0.0.1
+COMMENT: Azure AD search for users, groups or AAD Applications using the Microsoft Graph REST API
+===================================================================================================
+#>
 [CmdletBinding()]
 Param (
   [Parameter(Mandatory = $true, Position = 0)][string]$addressPrefix,
@@ -19,7 +30,7 @@ function ValidateAzAddressPrefix ($addressPrefix) {
   [int]$CIDR = $addressPrefix.split("/")[1]
   $script:binIP = (ConvertIPToBinary $NetworkID).Replace(".", "")
   $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))
-  
+
   $bValidAddressPrefix = $true
 
   # 1. make sure CIDR notation value is between 1 and 29
@@ -40,23 +51,23 @@ function ValidateIP ($strIP) {
   $arrSections += $strIP.split(".")
   #firstly, make sure there are 4 sections in the IP address
   if ($arrSections.count -ne 4) { $bValidIP = $false }
-	
+
   #secondly, make sure it only contains numbers and it's between 0-254
   if ($bValidIP) {
     foreach ($item in $arrSections) {
-      if ($item -notmatch "^\d{1,3}$") { 
-        $bValidIP = $false 
+      if ($item -notmatch "^\d{1,3}$") {
+        $bValidIP = $false
       }
     }
   }
-	
+
   if ($bValidIP) {
     foreach ($item in $arrSections) {
       $item = [int]$item
       if ($item -lt 0 -or $item -gt 254) { $bValidIP = $false }
     }
   }
-	
+
   $bValidIP
 }
 
@@ -79,7 +90,7 @@ function ConvertIPToBinary ($strIP) {
         $strBinaryIP = $strBinaryIP + "."
       }
       $strBinaryIP = $strBinaryIP + (ConvertToBinary $section)
-			
+
     }
   }
   $strBinaryIP
@@ -95,7 +106,7 @@ Function ConvertBinaryToIP ($script:binIP) {
 }
 
 Function GetUsableIPByIndex ($index) {
-  $binIndex = [convert]::ToString($index, 2) 
+  $binIndex = [convert]::ToString($index, 2)
   $indexIPReplaceStr = ""
   $i = 0
   do {
@@ -126,8 +137,7 @@ Write-Verbose "Validating $addressPrefix"
 if (!(ValidateAzAddressPrefix $addressPrefix)) {
   Throw "Invalid Network CIDR specified."
   Exit -1
-}
-else {
+} else {
   Write-verbose "Network ID $addressPrefix is valid"
 }
 
@@ -151,7 +161,7 @@ Write-Verbose "There are $AzSubnetSize usable IPs in Azure subnet $addressPrefix
 $script:binIP = (ConvertIPToBinary $NetworkID).Replace(".", "")
 $script:binIPNetworkSection = $script:binIP.substring(0, $CIDR)
 $script:binIPAddressSection = $script:binIP.substring($CIDR, $(32 - $CIDR))
-	
+
 #Azure Gateway IP
 $strAzGWIP = GetUsableIPByIndex 1
 Write-Verbose "The gateway IP for the Azure subnet is $strAzGWIP"

@@ -110,7 +110,7 @@ storageAccountId | string |
     "$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
     "contentVersion": "1.0.0.0",
     "metadata": {
-        "template": "/Users/tao/git/BlogPosts/Azure-Bicep/vnet-integrated-cloud-shell/main.json"
+        "template": "./Azure-Bicep/vnet-isolated-cloud-shell/main.json"
     },
     "parameters": {
         "location": {
@@ -151,3 +151,4 @@ storageAccountId | string |
     }
 }
 ```
+
