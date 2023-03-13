@@ -51,11 +51,14 @@ if ($adf) {
   if ($globalParameters) {
     Write-Output "Global Parameters found. Updating Global Parameters"
     $globalParameters
+    #Save updated Parameter File
+    $parameterFileJson.parameters.globalParameters.value = $globalParameters
+    $parameterFileJson | ConvertTo-Json -Depth 10 | Set-Content $UpdatedParameterFile
+    $deployParameters.add('TemplateParameterFile', $UpdatedParameterFile)
+  } else {
+    Write-Output "ADF $dataFactoryName exists but there are no existing Global Parmaeters. No need to update the GlobalParameter parameter value"
+    $deployParameters.add('TemplateParameterFile', $templateParameterFile)
   }
-  $parameterFileJson.parameters.globalParameters.value = $globalParameters
-  $deployParameters.add('TemplateParameterFile', $UpdatedParameterFile)
-  #Save updated Parameter File
-  $parameterFileJson | ConvertTo-Json -Depth 10 | Set-Content $UpdatedParameterFile
 
 } else {
   Write-Output "ADF $dataFactoryName does not exist. No need to update the GlobalParameter parameter value"
