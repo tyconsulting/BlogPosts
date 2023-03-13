@@ -1,0 +1,23 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "template": "./main.bicep"
+  },
+  "parameters": {
+    "tags": {
+      "value": {
+        "Environment": "Lab"
+      }
+    },
+    "location": {
+      "value": "australiaeast"
+    },
+    "name": {
+      "value": "adf-tao-poc-01"
+    },
+    "globalParameters": {
+      "value": {}
+    }
+  }
+}
