@@ -1,0 +1,41 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "metadata": {
+    "template": "./main.bicep"
+  },
+  "parameters": {
+    "alertRuleName": {
+      "value": "ar-az-policy"
+    },
+    "alertRuleDescription": {
+      "value": "Alert rule for Azure Policy noncompliant resources."
+    },
+    "alertSeverity": {
+      "value": 1
+    },
+    "alertRuleDisplayName": {
+      "value": "Azure Policy noncompliant resources"
+    },
+    "actionGroupName": {
+      "value": "actgrp-az-policy"
+    },
+    "actionGroupShortName": {
+      "value": "azpolicy"
+    },
+    "alertRuleFrequencyMinutes": {
+      "value": 15
+    },
+    "emailReceivers": {
+      "value": [
+        {
+          "name": "Tao Yang",
+          "emailAddress": "tao@taoyang.cloud"
+        }
+      ]
+    },
+    "logAnalyticsWorkspaceResourceId": {
+      "value": "/subscriptions/xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx/resourcegroups/xxxxxxxx/providers/microsoft.operationalinsights/workspaces/xxxxxxxx"
+    }
+  }
+}
