@@ -247,4 +247,5 @@ ModelManifest.xml
 
 #test files
 main.parameters.test.json
+main.parameters.lab.json
 test.md

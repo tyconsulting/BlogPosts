@@ -58,7 +58,7 @@ policySetDefinitionId = tostring(properties.policySetDefinitioNId),
 policySetDefinitionCategory = tostring(properties.policySetDefinitioNCategory),
 dtTimeStamp = todatetime(tostring(properties.timestamp))
 | where complianceState =~ 'noncompliant'
-| where dtTimeStamp >  now(-15m)
+| where dtTimeStamp >= now(-{0}m)
 | project complianceState, id, name, policyAssignmentName, resourceId, resourceType, policyAssignmentId, policyDefinitionId, policySetDefinitionId, policySetDefinitionCategory, policyDefinitionAction, policyDefinitionGroupNames, resourceGroup, resourceLocation,subscriptionId, tenantId, apiVersion, timeStamp=tostring(properties.timestamp)
 '''
 var argQuery = format(argQueryTemplate, alertRuleFrequencyMinutes)
