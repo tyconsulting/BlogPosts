@@ -2,7 +2,7 @@
 
 ## Overview
 
-Blog Post: [Natively Monitoring Azure Policy Compliance States in Azure Monitor - 2023 Edition](https://blog.tyang.org/2023/09/30/natively0monitoring-azure-policy-compliance-states-inazure-monitor-2023-edition/)
+Blog Post: [Natively Monitoring Azure Policy Compliance States in Azure Monitor - 2023 Edition](https://blog.tyang.org/2023/09/30/natively0monitoring-azure-policy-compliance-states-in-azure-monitor-2023-edition/)
 
 
 # Instruction
