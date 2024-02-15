@@ -110,7 +110,7 @@ module networkSecurityGroup 'br/alias:network.network-security-group:<version>' 
       }
       {
         access: 'Deny'
-        description: 'Allow inbound access on TCP 8082'
+        description: 'Deny inbound access on TCP 8080'
         destination: [
           '<applicationSecurityGroup1ResourceId>'
           '<applicationSecurityGroup2ResourceId>'
@@ -230,7 +230,7 @@ module networkSecurityGroup 'br/alias:network.network-security-group:<version>' 
         },
         {
           "access": "Deny",
-          "description": "Allow inbound access on TCP 8082",
+          "description": "Deny Outbound access on TCP 8080",
           "destination": [
             "<applicationSecurityGroup1ResourceId>",
             "<applicationSecurityGroup2ResourceId>"

@@ -118,7 +118,7 @@ module testDeployment '../../main.bicep' = {
       {
         name: 'Port_8080'
         access: 'Deny'
-        description: 'Allow inbound access on TCP 8082'
+        description: 'Deny outbound access on TCP 8080'
         destination: [
           nestedDependencies.outputs.applicationSecurityGroup1ResourceId
           nestedDependencies.outputs.applicationSecurityGroup2ResourceId
