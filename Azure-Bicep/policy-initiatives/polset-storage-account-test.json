@@ -1,0 +1,375 @@
+{
+  "name": "polset-storage-account-test",
+  "properties": {
+    "displayName": "TYANG-Secure Storage Accounts Test",
+    "description": "This policy initiative defines the security requirements for Storage accounts",
+    "metadata": {
+      "category": "TYANG - Storage Account",
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "doubleEncryptionEffect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Storage Account use Double Encryption effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Audit"
+      },
+      "blobSoftDeleteEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deploy Storage Account blob Soft-Delete effect",
+          "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+          "DeployIfNotExists",
+          "Disabled"
+        ],
+        "defaultValue": "DeployIfNotExists"
+      },
+      "blobSoftDeleteEvaluationDelay": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deploy Storage Account blob Soft-Delete Evaluation Delay",
+          "description": "Specifies when the existence of the related resources should be evaluated. The delay is only used for evaluations that are a result of a create or update resource request. Allowed values are AfterProvisioning, AfterProvisioningSuccess, AfterProvisioningFailure, or an ISO 8601 duration between 0 and 360 minutes."
+        },
+        "defaultValue": "AfterProvisioning"
+      },
+      "blobSoftDeleteMinimumRetentionInDays": {
+        "type": "Integer",
+        "metadata": {
+          "displayName": "Blob Soft Delete Minimum Retention in days",
+          "description": "The minimum retention in days for the soft deleted blob. Allowed Value: 1-30"
+        },
+        "defaultValue": 7
+      },
+      "blobSoftDeleteAllowPermanentDelete": {
+        "type": "Boolean",
+        "metadata": {
+          "displayName": "Blob Soft Delete Allow Permanent Delete",
+          "description": "Allows deletion of the soft deleted blob versions and snapshots"
+        },
+        "defaultValue": true
+      },
+      "restrictNetworkAccessEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Storage accounts should restrict network access effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "restrictVirtualNetworkRulesEffect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Deny Storage Account restrict virtual network rules effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "preventCrossTenantReplEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deny Storage Account prevent cross tenant replication effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "preventSharedKeyAccessEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Audit Storage Account should prevent shared key access effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Audit",
+          "Deny",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "secureTransferEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Storage Account secure transfer effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Deny",
+          "Audit",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "publicEndpointEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Restrict Storage Account public endpoint effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disabled' turns off the policy."
+        },
+        "allowedValues": [
+          "Deny",
+          "Audit",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "minTlsVersion": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Storage Account Minimum TLS Version",
+          "description": "Minimum version of TLS required to access data in the storage account"
+        },
+        "allowedValues": [
+          "TLS1_0",
+          "TLS1_1",
+          "TLS1_2"
+        ],
+        "defaultValue": "TLS1_2"
+      },
+      "minTlsVersionEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deny Storage Account minimum TLS version effect",
+          "description": "'Audit' allows a non-compliant resource to be created, but flags it as non-compliant. 'Deny' blocks the resource creation. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "Deny",
+          "Audit",
+          "Disabled"
+        ],
+        "defaultValue": "Deny"
+      },
+      "deployAdvThreatProtectionEffect": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deploy Storage Account Advanced Threat Protection Effect",
+          "description": "Enable or disable the execution of the policy"
+        },
+        "allowedValues": [
+          "DeployIfNotExists",
+          "Disabled"
+        ],
+        "defaultValue": "DeployIfNotExists"
+      },
+      "deployAdvThreatProtectionEvaluationDelay": {
+        "type": "string",
+        "metadata": {
+          "displayName": "Deploy Storage Account Advanced Threat Protection Evaluation Delay",
+          "description": "Specifies when the existence of the related resources should be evaluated. The delay is only used for evaluations that are a result of a create or update resource request. Allowed values are AfterProvisioning, AfterProvisioningSuccess, AfterProvisioningFailure, or an ISO 8601 duration between 0 and 360 minutes."
+        },
+        "defaultValue": "AfterProvisioning"
+      }
+    },
+    "policyDefinitionGroups": [
+      {
+        "name": "ISO27001-2013_A.8.2.3",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.8.2.3"
+      },
+      {
+        "name": "ISO27001-2013_A.10.1.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.10.1.1"
+      },
+      {
+        "name": "ISO27001-2013_A.12.2.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.12.2.1"
+      },
+      {
+        "name": "ISO27001-2013_A.12.3.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.12.3.1"
+      },
+      {
+        "name": "ISO27001-2013_A.12.6.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.12.6.1"
+      },
+      {
+        "name": "ISO27001-2013_A.13.1.2",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.13.1.2"
+      },
+      {
+        "name": "ISO27001-2013_A.14.1.2",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.14.1.2"
+      },
+      {
+        "name": "ISO27001-2013_A.17.1.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.17.1.1"
+      },
+      {
+        "name": "ISO27001-2013_A.17.1.2",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.17.1.2"
+      }
+    ],
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "pol-audit-storage-account-should-prevent-shared-key-access",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-audit-storage-account-should-prevent-shared-key-access",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('preventSharedKeyAccessEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.3.1",
+          "ISO27001-2013_A.17.1.1",
+          "ISO27001-2013_A.17.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-audit-storage-account-use-double-encryption",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-audit-storage-account-use-double-encryption",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('doubleEncryptionEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.10.1.1"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-account-minimum-tls-version",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-account-minimum-tls-version",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('minTlsVersionEffect')]"
+          },
+          "minimumTlsVersion": {
+            "value": "[parameters('minTlsVersion')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.14.1.2",
+          "ISO27001-2013_A.10.1.1",
+          "ISO27001-2013_A.8.2.3"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-account-prevent-cross-tenant-repl",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-account-prevent-cross-tenant-repl",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('preventCrossTenantReplEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.3.1",
+          "ISO27001-2013_A.17.1.1",
+          "ISO27001-2013_A.17.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-account-public-endpoint",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-account-public-endpoint",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('publicEndpointEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.13.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-account-restrict-virtual-network-rules",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-account-restrict-virtual-network-rules",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('restrictVirtualNetworkRulesEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.3.1",
+          "ISO27001-2013_A.17.1.1",
+          "ISO27001-2013_A.17.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-account-secure-transfer",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-account-secure-transfer",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('secureTransferEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.10.1.1",
+          "ISO27001-2013_A.14.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deny-storage-accounts-should-restrict-network-access",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deny-storage-accounts-should-restrict-network-access",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('restrictNetworkAccessEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.3.1",
+          "ISO27001-2013_A.17.1.1",
+          "ISO27001-2013_A.17.1.2"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deploy-storage-account-advanced-threat-protection",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deploy-storage-account-advanced-threat-protection",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('deployAdvThreatProtectionEffect')]"
+          },
+          "evaluationDelay": {
+            "value": "[parameters('deployAdvThreatProtectionEvaluationDelay')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.2.1",
+          "ISO27001-2013_A.12.6.1"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "pol-deploy-storage-account-blob-soft-delete",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-deploy-storage-account-blob-soft-delete",
+        "parameters": {
+          "effect": {
+            "value": "[parameters('blobSoftDeleteEffect')]"
+          },
+          "evaluationDelay": {
+            "value": "[parameters('blobSoftDeleteEvaluationDelay')]"
+          },
+          "minimumRetentionInDays": {
+            "value": "[parameters('blobSoftDeleteMinimumRetentionInDays')]"
+          },
+          "allowPermanentDelete": {
+            "value": "[parameters('blobSoftDeleteAllowPermanentDelete')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.12.3.1",
+          "ISO27001-2013_A.17.1.1",
+          "ISO27001-2013_A.17.1.2"
+        ]
+      }
+    ]
+  }
+}

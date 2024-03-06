@@ -1,0 +1,5 @@
+{
+  "itemDisplayName": "Policy Definitions",
+  "description": "This template deploys the policy definitions to the a management group.",
+  "summary": "Demo template for the Policy Definition Bicep module"
+}

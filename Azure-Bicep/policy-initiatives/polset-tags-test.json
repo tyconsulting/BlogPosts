@@ -1,0 +1,91 @@
+{
+  "name": "polset-tags-test",
+  "properties": {
+    "displayName": "TYANG-Resource Tags Test",
+    "description": "This policy initiative defines apply required resource tags from parent subscription and resource group",
+    "metadata": {
+      "category": "TYANG - General",
+      "version": "1.0.0"
+    },
+    "parameters": {
+      "subEnvTagName": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Subscription Environment Tag Name",
+          "description": "Name of the Subscription Environment Tag"
+        },
+        "defaultValue": "Environment"
+      },
+      "subEnvTagEffect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Subscription Environment Tag effect",
+          "description": "''modify' modifies the specific tag. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "modify",
+          "Disabled"
+        ],
+        "defaultValue": "modify"
+      },
+      "rgAppTagName": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Resource Group 'AppName Tag Name",
+          "description": "Name of the Resource Group 'AppName' Tag"
+        },
+        "defaultValue": "AppName"
+      },
+      "rgAppTagEffect": {
+        "type": "String",
+        "metadata": {
+          "displayName": "Resource Group 'AppName Tag effect",
+          "description": "''modify' modifies the specific tag. 'Disable' turns off the policy."
+        },
+        "allowedValues": [
+          "modify",
+          "Disabled"
+        ],
+        "defaultValue": "modify"
+      }
+    },
+    "policyDefinitionGroups": [
+      {
+        "name": "ISO27001-2013_A.18.1.1",
+        "additionalMetadataId": "/providers/Microsoft.PolicyInsights/policyMetadata/ISO27001-2013_A.8.2.3"
+      }
+    ],
+    "policyDefinitions": [
+      {
+        "policyDefinitionReferenceId": "subEnvTag",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-inherit-tags-from-sub",
+        "parameters": {
+          "tagName": {
+            "value": "[parameters('subEnvTagName')]"
+          },
+          "effect": {
+            "value": "[parameters('subEnvTagEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.18.1.1"
+        ]
+      },
+      {
+        "policyDefinitionReferenceId": "rgAppTag",
+        "policyDefinitionId": "{policyLocationResourceId}/providers/Microsoft.Authorization/policyDefinitions/pol-inherit-tags-from-rg",
+        "parameters": {
+          "tagName": {
+            "value": "[parameters('rgAppTagName')]"
+          },
+          "effect": {
+            "value": "[parameters('rgAppTagEffect')]"
+          }
+        },
+        "groupNames": [
+          "ISO27001-2013_A.18.1.1"
+        ]
+      }
+    ]
+  }
+}

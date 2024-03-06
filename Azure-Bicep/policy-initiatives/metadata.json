@@ -1,0 +1,5 @@
+{
+  "itemDisplayName": "Policy Initiatives",
+  "description": "This template deploys the policy initiatives in a management group.",
+  "summary": "Demo template for the Policy Initiative Bicep module"
+}
