@@ -90,16 +90,16 @@ function Get-GitDefaultBranchFromRemote {
 Gets the name of the current Git branch.
 
 .DESCRIPTION
-The `get-GitBranch` function retrieves the name of the current Git branch by running the `git branch --show-current` command. It returns the name of the branch as a string.
+The `Get-GitBranch` function retrieves the name of the current Git branch by running the `git branch --show-current` command. It returns the name of the branch as a string.
 
 .EXAMPLE
-PS C:\> get-GitBranch
+PS C:\> Get-GitBranch
 main
 
 This command returns the name of the current Git branch.
 
 #>
-function get-GitBranch {
+function Get-GitBranch {
   [CmdletBinding()]
   [OutputType([string])]
   param ()
@@ -348,7 +348,7 @@ function Get-GitTagSourceBranch {
 Checks if a specified commit ID exists in a given branch.
 
 .DESCRIPTION
-The `IsCommitIdInBranch` function checks if a specified commit ID exists in a given branch by retrieving all commit IDs of the branch using the `git rev-list` command. It returns a boolean value indicating whether the commit ID is found in the branch.
+The `Find-CommitIdInBranch` function checks if a specified commit ID exists in a given branch by retrieving all commit IDs of the branch using the `git rev-list` command. It returns a boolean value indicating whether the commit ID is found in the branch.
 
 .PARAMETER branchName
 The name of the branch to check. This parameter is mandatory.
@@ -357,13 +357,13 @@ The name of the branch to check. This parameter is mandatory.
 The commit ID to check for in the branch. This parameter is mandatory.
 
 .EXAMPLE
-PS C:\> IsCommitIdInBranch -branchName main -commitId a1b2c3d4e5f6g7h8i9j0
+PS C:\> Find-CommitIdInBranch -branchName main -commitId a1b2c3d4e5f6g7h8i9j0
 True
 
 This command checks if the commit ID 'a1b2c3d4e5f6g7h8i9j0' exists in the 'main' branch and returns True if it does.
 
 #>
-function IsCommitIdInBranch {
+function Find-CommitIdInBranch {
   [CmdletBinding()]
   [OutputType([System.Boolean])]
   Param (
