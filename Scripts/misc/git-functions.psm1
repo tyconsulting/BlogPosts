@@ -322,7 +322,7 @@ function Get-GitTagSourceBranch {
     [string]$tag
   )
   $arrBranchName = @()
-  Write-Verbose "Get source branch of the tag '$tag'" -verbose
+  Write-Verbose "Get source branch of the tag '$tag'"
   $branchName = git branch --contains $tag
   #Remove the line "(HEAD detached at {tag})" from output
   If ($branchName -is [System.Array]) {
@@ -330,7 +330,7 @@ function Get-GitTagSourceBranch {
       $line = $line -replace '\* ', ''
       $line = $line.trim()
       if (!($line -match 'Head detached at')) {
-        Write-Verbose "Validate branch '$line'" -Verbose
+        Write-Verbose "Validate branch '$line'"
         $isValidBranch = Test-BranchName -branchName $line
         if ($isValidBranch)
         { $arrBranchName += $line }
@@ -379,13 +379,13 @@ function Find-CommitIdInBranch {
   #Get all commit Ids of the branch
 
   $commitIds = git rev-list $branchName
-  Write-Verbose "Total $($commitIds.count) commits found in the branch '$branch'." -Verbose
+  Write-Verbose "Total $($commitIds.count) commits found in the branch '$branchName'."
   #check if the specified commit Id is in the commit Ids
   if ($commitIds -contains ($commitId)) {
-    Write-Verbose "Commit Id '$commitId' found from all the commit Ids." -Verbose
+    Write-Verbose "Commit Id '$commitId' found from all the commit Ids."
     $isValid = $true
   } else {
-    Write-Verbose "Commit Id '$commitId' not found from the commit Ids." -Verbose
+    Write-Verbose "Commit Id '$commitId' not found from the commit Ids."
     $isValid = $false
   }
   $isValid
