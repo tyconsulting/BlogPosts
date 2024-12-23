@@ -1,3 +1,32 @@
 {
-  "bicep.trace.server": "Verbose"
+  "files.exclude": {
+    ".vs/": true,
+    "reports/": false,
+    "out/": true
+  },
+  "files.associations": {
+    "**/pipelines/**/*.yml": "azure-pipelines"
+  },
+  "files.insertFinalNewline": true,
+  "editor.tabSize": 2,
+  "editor.formatOnSave": true,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "yaml.format.singleQuote": true,
+  "yaml.format.enable": true,
+  "yaml.format.bracketSpacing": true,
+  "[bicep]": {
+    "editor.defaultFormatter": "ms-azuretools.vscode-bicep"
+  },
+  "[powershell]": {
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2
+  },
+  "git.branchProtection": [
+    "master"
+  ],
+  "bicep.trace.server": "Verbose",
+  "powershell.codeFormatting.preset": "OTBS",
+  "powershell.scriptAnalysis.settingsPath": ".vscode/PSScriptAnalyzerSettings.psd1",
+  "powershell.scriptAnalysis.enable": true,
 }
